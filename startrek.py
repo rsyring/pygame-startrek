@@ -68,69 +68,74 @@ class Torpedo(pygame.sprite.Sprite):
         self.rect.x += self.speed
 
 
-def main():
-    """this function is called when the program starts.
-       it initializes everything it needs, then runs in
-       a loop until the function returns."""
-    # Initialize Everything
-    pygame.init()
 
-    size = (1200, 700)
-    screen = pygame.display.set_mode(size)
-    score = 0
+class TheGame:
 
-    # Setting the window title
-    pygame.display.set_caption("STAR TREK WARS I")
+    def __init__(self):
+        self.screen = None
+        self.bg_image = None
 
-    # Create The Backgound
-    bg_image, bg_rect = load_image('background2.jpg')
+        pygame.init()
 
-    # Display The Background
-    screen.blit(bg_image, (0, 0))
-    pygame.display.update()
+    def init_display(self, display_width, display_height):
+        size = (display_width, display_height)
+        self.screen = pygame.display.set_mode(size)
 
-    clock = pygame.time.Clock()
-    enterprise = Enterprise()
-    warbird = Warbird()
-    allsprites = pygame.sprite.RenderUpdates((enterprise, warbird))
-    torpedo_list = pygame.sprite.Group()
+        self.bg_image, _ = load_image('background2.jpg')
 
-    # Main Loop
-    going = True
-    while going:
-        # clear previous draws to avoid trailing effect
-        allsprites.clear(screen, bg_image)
+        # Apply the background
+        self.screen.blit(self.bg_image, (0, 0))
 
-        # limit loop to 60 frames per second
-        clock.tick(60)
+    def run(self):
+        # initial display setup
+        self.init_display(1200, 700)
+        pygame.display.set_caption('STAR TREK WARS I')
+        pygame.display.update()
 
-        # Handle Input Events
-        for event in pygame.event.get():
-            if event.type == const.QUIT:
-                going = False
-            elif event.type == const.KEYDOWN and event.key == const.K_ESCAPE:
-                going = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                torpedo = Torpedo()
-                # Set the torpedo so it is where the player is
-                torpedo.rect.center = enterprise.rect.center
-                # Add the torpedo to the lists
-                allsprites.add(torpedo)
-                torpedo_list.add(torpedo)
-        allsprites.update()
+        clock = pygame.time.Clock()
+        enterprise = Enterprise()
+        warbird = Warbird()
+        allsprites = pygame.sprite.RenderUpdates((enterprise, warbird))
+        torpedo_list = pygame.sprite.Group()
+        score = 0
 
-        # Calculate mechanics for each torpedo
-        for torpedo in pygame.sprite.spritecollide(warbird, torpedo_list, True):
-            torpedo_list.remove(torpedo)
-            allsprites.remove(torpedo)
-            score += 1
-            print(score)
+        # Main Loop
+        going = True
+        while going:
+            # clear previous draws to avoid trailing effect
+            allsprites.clear(self.screen, self.bg_image)
 
-        # Draw changes
-        changes = allsprites.draw(screen)
-        pygame.display.update(changes)
+            # limit loop to 60 frames per second
+            clock.tick(60)
 
-    pygame.quit()
+            # Handle Input Events
+            for event in pygame.event.get():
+                if event.type == const.QUIT:
+                    going = False
+                elif event.type == const.KEYDOWN and event.key == const.K_ESCAPE:
+                    going = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    torpedo = Torpedo()
+                    # Set the torpedo so it is where the player is
+                    torpedo.rect.center = enterprise.rect.center
+                    # Add the torpedo to the lists
+                    allsprites.add(torpedo)
+                    torpedo_list.add(torpedo)
+            allsprites.update()
+
+            # Calculate mechanics for each torpedo
+            for torpedo in pygame.sprite.spritecollide(warbird, torpedo_list, True):
+                torpedo_list.remove(torpedo)
+                allsprites.remove(torpedo)
+                score += 1
+                print(score)
+
+            # Draw changes
+            changes = allsprites.draw(self.screen)
+            pygame.display.update(changes)
+
+        pygame.quit()
+
 
 if __name__ == '__main__':
-    main()
+    TheGame().run()
