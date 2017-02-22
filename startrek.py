@@ -78,8 +78,9 @@ class TheGame:
         pygame.init()
 
     def init_display(self, display_width, display_height):
+        mode = pygame.RESIZABLE
         size = (display_width, display_height)
-        self.screen = pygame.display.set_mode(size)
+        self.screen = pygame.display.set_mode(size, mode)
 
         self.bg_image, _ = load_image('background2.jpg')
 
@@ -102,6 +103,9 @@ class TheGame:
         # Main Loop
         going = True
         while going:
+            # Do our events warrant a full display update
+            full_update = False
+
             # clear previous draws to avoid trailing effect
             allsprites.clear(self.screen, self.bg_image)
 
@@ -121,6 +125,9 @@ class TheGame:
                     # Add the torpedo to the lists
                     allsprites.add(torpedo)
                     torpedo_list.add(torpedo)
+                elif event.type == pygame.VIDEORESIZE:
+                    self.init_display(event.w, event.h)
+                    full_update = True
             allsprites.update()
 
             # Calculate mechanics for each torpedo
@@ -132,7 +139,10 @@ class TheGame:
 
             # Draw changes
             changes = allsprites.draw(self.screen)
-            pygame.display.update(changes)
+            if full_update:
+                pygame.display.update()
+            else:
+                pygame.display.update(changes)
 
         pygame.quit()
 
