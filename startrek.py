@@ -86,18 +86,21 @@ def main():
     bg_image, bg_rect = load_image('background2.jpg')
 
     # Display The Background
-    screen.blit(bg_image, (-800, 0))
-    pygame.display.flip()
+    screen.blit(bg_image, (0, 0))
+    pygame.display.update()
 
     clock = pygame.time.Clock()
     enterprise = Enterprise()
     warbird = Warbird()
-    allsprites = pygame.sprite.Group((enterprise, warbird))
+    allsprites = pygame.sprite.RenderUpdates((enterprise, warbird))
     torpedo_list = pygame.sprite.Group()
 
     # Main Loop
     going = True
     while going:
+        # clear previous draws to avoid trailing effect
+        allsprites.clear(screen, bg_image)
+
         # limit loop to 60 frames per second
         clock.tick(60)
 
@@ -123,10 +126,9 @@ def main():
             score += 1
             print(score)
 
-        # Draw Everything
-        screen.blit(bg_image, (0, 0))
-        allsprites.draw(screen)
-        pygame.display.flip()
+        # Draw changes
+        changes = allsprites.draw(screen)
+        pygame.display.update(changes)
 
     pygame.quit()
 
